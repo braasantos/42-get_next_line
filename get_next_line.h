@@ -6,7 +6,7 @@
 /*   By: bjorge-m <bjorge-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 12:30:01 by bjorge-m          #+#    #+#             */
-/*   Updated: 2023/10/18 16:26:54 by bjorge-m         ###   ########.fr       */
+/*   Updated: 2023/10/19 18:47:22 by bjorge-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,4 +22,6 @@
 #endif
 
 char	*get_next_line(int fd);
+size_t	ft_strlen(const char *s);
+
 #endif

@@ -6,7 +6,7 @@
 /*   By: bjorge-m <bjorge-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 12:30:04 by bjorge-m          #+#    #+#             */
-/*   Updated: 2023/10/18 18:10:51 by bjorge-m         ###   ########.fr       */
+/*   Updated: 2023/10/19 16:54:41 by bjorge-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,59 +21,24 @@ size_t	ft_strlen(const char *s)
 		i++;
 	return (i);
 }
-
-int ft_strchr(const char *s, int c)
+int	ft_findnl(char *s)
 {
-	if (s == NULL)
+	char *new_str;
+	
+	if(!s)
 		return (0);
-	while (*s)
-	{
-		if (*s == (char)c)
-			return ((char *) s);
+	while(*s && *s != '\n')
 		s++;
-	}
-	if ((char)c == *s)
-		return ((char *) s);
-	return (NULL);
+	if (*s == '\n')
+		ft_strcpy(new_str, s);
+	return (0);
 }
 
-char	*ft_strcpy(char *dest, char *src)
+int	main(void)
 {
-	int	i;
+	char	src[25] = "Tenho fome"; 
+	char	dest[25];
 
-	i = 0;
-	while (src[i] != '\0')
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
-}
-char	*ft_strdup(const char *s)
-{
-	int		len;
-	char	*mlc;
-
-	len = ft_strlen(s);
-	mlc = (char *)malloc ((len + 1) * sizeof(char));
-	if (!mlc)
-		return (NULL);
-	return (ft_strcpy(mlc, s));
-}
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	size_t	len;
-	char	*mal;
-
-	if (!s1 || !s2)
-		return (NULL);
-	len = ft_strlen(s1) + ft_strlen(s2);
-	mal = (char *)malloc((len + 1) * sizeof(char));
-	if (!mal)
-		return (NULL);
-	else 
-	{
-		return (mal);
-	}
+	ft_strcpy(dest, src);
+	printf("%s", dest);
 }
