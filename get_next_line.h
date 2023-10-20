@@ -6,7 +6,7 @@
 /*   By: bjorge-m <bjorge-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 12:30:01 by bjorge-m          #+#    #+#             */
-/*   Updated: 2023/10/19 18:47:22 by bjorge-m         ###   ########.fr       */
+/*   Updated: 2023/10/20 13:45:38 by bjorge-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include <stdlib.h>
 
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 42
+#define BUFFER_SIZE 6
 #endif
 
 char	*get_next_line(int fd);

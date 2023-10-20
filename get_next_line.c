@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: bjorge-m <bjorge-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/17 12:29:54 by bjorge-m          #+#    #+#             */
-/*   Updated: 2023/10/19 19:25:40 by bjorge-m         ###   ########.fr       */
+/*   Created: 2023/10/20 13:46:27 by bjorge-m          #+#    #+#             */
+/*   Updated: 2023/10/20 18:51:09 by bjorge-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,130 +16,125 @@
 size_t	ft_strlen(const char *s)
 {
 	size_t	i;
-
+	if(!s)
+		return (0);
 	i = 0;
 	while (s[i])
 		i++;
 	return (i);
 }
-
 /*
 * concatena a string ate a newline
 */
-char	*ft_strlcat(char *dst, char *src, size_t size)
+char	*ft_strjoin(const char *s1, const char *s2)
 {
 	size_t	i;
 	size_t	j;
-	size_t	d_len;
-	size_t	s_len;
+	size_t	s1_len;
+	size_t	s2_len;
+	char *mlc;
 
-	d_len = ft_strlen(dst);
-	s_len = ft_strlen(src);
-	i = d_len;
-	j = 0;
-	if (i >= size || size == 0)
-		return (src);
-	while (src[j] && j < size - i)
+	s2_len = ft_strlen(s2);
+	s1_len = ft_strlen(s1);
+	mlc = (char *)malloc((s1_len + s2_len + 1) * sizeof(char));
+	if (!mlc)
+		return (NULL);
+	i = 0;
+	while (s1 && s1[i])
 	{
-		dst[i + j] = src[j];
-		j++;
+		mlc[i] = s1[i];
+		i++;
 	}
-	dst[i + j] = '\0';
-	return (dst);
+	j = 0;
+	while (s2 && s2[j])
+		mlc[i++] = s2[j++];
+	mlc[i] = '\0';
+	return (mlc);
 }
 /*
 * cria uma nova string com o conteudo do buffer ate a newline
 */
-char	*ft_strlcpy(char *dst, const char *src, int size)
+char	*ft_strdup(const char *s)
 {
-	int	i;
+	int		len;
+	int		i;
+	char	*mlc;
 
+	len = ft_strlen(s);
+	mlc = (char *)malloc ((len + 1) * sizeof(char));
+	if (!mlc)
+		return (NULL);
 	i = 0;
-	if (size > 0)
+	while (s[i] && s[i] != '\n')
 	{
-		while (src[i] && i < size)
-		{
-			dst[i] = src[i];
-			i++;
-		}
-		if (src[i] == '\n')
-		{
-			dst[i] = src[i];
-			i++;
-		}
-		dst[i] = '\0';
+		mlc[i] = s[i];
+		i++;
 	}
-	return (dst);
+	mlc[i] = '\0';
+	return (mlc);
 }
-
 /*
-* procura a new line e devolve a posicao da new line 
+* serve com flag para saber se tem uma new line na string 
 */
-char	*ft_findnl(char *s, char *buffer)
+int ft_findnl(char *s)
 {
 	int i;
-	i = 0;
-	if(!s[i])
-		return (NULL);
-	while(s[i] && s[i] != '\n')
-		i++;
-	if (s[i] == '\n')
-	{
-		buffer = ft_strlcpy(buffer, s, i);
-		//printf("%s\n", buffer);
-	}
-	else 
-	{		i++;
-		buffer = ft_strlcpy(buffer, s, i);
-		//buffer = ft_strlcat(buffer, s, i);
-	}
-	return (buffer);
-}
 
+	i = 0;
+	if(!s)
+		return (0);
+	while(s[i] && s[i] != '\n')
+	{
+		i++;	
+	}
+		if(s[i] == '\n')
+			return (1);
+	return (0);
+}
+/*
+* adiciona o conteudo do ficheiro ao buff e verifica se tem uma new line 
+*/
 char	*add_to_buff(int fd, char *buffer)
 {
 	char *buff;
+	char *new_str;
 	int bytes;
 
 	buff = malloc(BUFFER_SIZE + 1 * sizeof(char));
 	if (!buff)
 		return (NULL);
-	//bytes = 1;
-	bytes = read(fd, buff, BUFFER_SIZE);
-	//printf("%s\n", buff);
- 	while (bytes != 0)
-	{
-		if (bytes == -1)
+	bytes = 1;
+ 	while (bytes != 0 && !ft_findnl(buffer))
+	{	
+		bytes = read(fd, buff, BUFFER_SIZE);
+		if (bytes < 0)
 		{
 			free(buff);
+			if (buffer)
+				free(buffer);
 			return (NULL);
 		}
-		else 
-		{
-			ft_findnl(buff, buffer);
-			break ;
-		}
+		buffer = ft_strjoin(buffer, buff);
 	}
+	//new_str = ft_strdup(buffer);
 	free(buff);
 	return (buffer);
 }
-//else ft_strchr(buffer, '\n');
-
+/*
+* funcao principal
+*/
 char	*get_next_line(int fd)
 {
-	// a variavel que vai guardar tudo
 	char	*line;
-	static char buffer[BUFFER_SIZE + 1];
+	static char *buffer;
 
 	if (fd < 0 || BUFFER_SIZE <= 0) // buffer_size n pode ser negativo nem igual a 0 senao n vai ler nada 
 		return (NULL);
-	line = add_to_buff(fd, buffer);
-	if (!line)
-		return (NULL);
-		//printf("%s\n", line);
+	buffer = add_to_buff(fd, buffer);
+	line = ft_strdup(buffer);
+	//free(buffer);
 	return (line);
 }
-// uma funcao para encontrar a new line e devolver a uma string com s caracters encontrados ate agora
 
 int	main(void)
 {
@@ -160,4 +155,19 @@ int	main(void)
 	}
 	return (0);
 }
+
+/*int	main(void)
+{
+	int		fd;
+	char	*line;
+	fd = open("test.txt", O_RDONLY);	
+	line = get_next_line(fd);
+	while (line)
+	{
+		printf("%s", line );
+		free(line);
+		line = get_next_line(fd);
+	}
+	return (0);
+}*/
 	
