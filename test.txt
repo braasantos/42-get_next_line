@@ -1,0 +1,41 @@
+este e apenas
+um teste
+da tua
+get_next_line
+Lorem ipsum dolor sit amet,
+consectetur adipiscing elit.
+Etiam vitae feugiat magna,
+quis hendrerit erat. 
+Integer nisl lorem, dapibus 
+at turpis in, pellentesque auctor odio. 
+Sed dictum faucibus 
+velit, commodo vehicula 
+turpis suscipit sed. 
+Aliquam posuere et enim at 
+tristique. Duis tellus ligula, aliquet sit amet 
+efficitur eget, aliquet 
+nec mi. Sed tincidunt tortor at orci viv
+erra mattis. Nullam condimentum f
+ringilla ipsum. Nullam elementum al
+iquet eros in
+tempor. Mo
+rbi eu euismod
+purus. Ut facilisi
+s elementum nisl sit amet pl
+acerat. Aliquam pharetra, velit 
+vitae lobortis su
+scipit, mi lac
+u
+s
+sollicitudin
+enim, eget vehicula 
+nulla massa in dui
+. Aenean vel maximus odio, 
+u
+t
+     
+tempor lorem. Mauris d
+iam lectus, porta in
+massa sed, fringilla f
+acilisis sem.
+
