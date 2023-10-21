@@ -6,7 +6,7 @@
 /*   By: bjorge-m <bjorge-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/20 13:46:27 by bjorge-m          #+#    #+#             */
-/*   Updated: 2023/10/20 18:51:09 by bjorge-m         ###   ########.fr       */
+/*   Updated: 2023/10/21 14:10:39 by bjorge-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,27 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 /*
+* serve com flag para saber se tem uma new line na string 
+*/
+int ft_findnl(char *s)
+{
+	int i;
+
+	i = 0;
+	if(!s)
+		return (0);
+	while(s[i] && s[i] != '\n')
+	{
+		i++;	
+	}
+		if(s[i] == '\n')
+			return (1);
+	return (0);
+}
+/*
 * concatena a string ate a newline
 */
-char	*ft_strjoin(const char *s1, const char *s2)
+char	*ft_strjoin( char *s1,  char *s2)
 {
 	size_t	i;
 	size_t	j;
@@ -54,12 +72,13 @@ char	*ft_strjoin(const char *s1, const char *s2)
 /*
 * cria uma nova string com o conteudo do buffer ate a newline
 */
-char	*ft_strdup(const char *s)
+char	*ft_strdup( char *s)
 {
 	int		len;
 	int		i;
 	char	*mlc;
-
+	if (!s || *s == '\0')
+		return (NULL);
 	len = ft_strlen(s);
 	mlc = (char *)malloc ((len + 1) * sizeof(char));
 	if (!mlc)
@@ -70,26 +89,44 @@ char	*ft_strdup(const char *s)
 		mlc[i] = s[i];
 		i++;
 	}
+	if (s[i] == '\n')
+	{
+		mlc[i] = s[i];
+		i++;
+	}
 	mlc[i] = '\0';
+	free(s);
 	return (mlc);
 }
-/*
-* serve com flag para saber se tem uma new line na string 
-*/
-int ft_findnl(char *s)
-{
-	int i;
 
+/*
+* limpa o buffer para quando for chamado novamente ele junta tudo depois da nova linha 
+*/
+char	*ft_nextline(char *s)
+{
+	char	*mlc;
+	int i;
+	int j;
 	i = 0;
-	if(!s)
-		return (0);
-	while(s[i] && s[i] != '\n')
+	while (s[i] && s[i] != '\n')
+		i++;
+	if (!s)
 	{
-		i++;	
+		free(s);
+		return (NULL);
 	}
-		if(s[i] == '\n')
-			return (1);
-	return (0);
+	mlc = (char *)malloc((ft_strlen(s)- i + 1) *sizeof(char));
+	if(!mlc)
+		return (NULL);
+	i++;
+	j = 0;
+	while (s[i])
+	{
+		mlc[j++] = s[i++];
+	}
+	mlc[j] = '\0';
+	free(s);
+	return (mlc);
 }
 /*
 * adiciona o conteudo do ficheiro ao buff e verifica se tem uma new line 
@@ -97,7 +134,6 @@ int ft_findnl(char *s)
 char	*add_to_buff(int fd, char *buffer)
 {
 	char *buff;
-	char *new_str;
 	int bytes;
 
 	buff = malloc(BUFFER_SIZE + 1 * sizeof(char));
@@ -114,9 +150,11 @@ char	*add_to_buff(int fd, char *buffer)
 				free(buffer);
 			return (NULL);
 		}
+		buff[bytes] = '\0';
 		buffer = ft_strjoin(buffer, buff);
+		if (ft_findnl(buffer))
+			break ;
 	}
-	//new_str = ft_strdup(buffer);
 	free(buff);
 	return (buffer);
 }
@@ -128,46 +166,39 @@ char	*get_next_line(int fd)
 	char	*line;
 	static char *buffer;
 
-	if (fd < 0 || BUFFER_SIZE <= 0) // buffer_size n pode ser negativo nem igual a 0 senao n vai ler nada 
+	if (fd < 0 || BUFFER_SIZE <= 0)
+	{
+		free(buffer);
 		return (NULL);
+	}
 	buffer = add_to_buff(fd, buffer);
+	if(!buffer)
+		return (NULL);
 	line = ft_strdup(buffer);
-	//free(buffer);
+	buffer = ft_nextline(buffer);
 	return (line);
 }
 
-int	main(void)
+int main(void)
 {
-	int		fd;
-	char	*line;
-	int i = 0;
-	fd = open("test.txt", O_RDONLY);
-	while (1)
-	{
-		line = get_next_line(fd);
-		if (line == NULL)
-			break;
-		else
-		{
-		printf("%s", line);
-		break ;	
-		}
-	}
-	return (0);
-}
+    int fd;
+    char *line;
+    fd = open("test.txt", O_RDONLY);
+    
+    if (fd == -1) {
+        perror("Error opening file");
+        return 1;
+    }
 
-/*int	main(void)
-{
-	int		fd;
-	char	*line;
-	fd = open("test.txt", O_RDONLY);	
-	line = get_next_line(fd);
-	while (line)
-	{
-		printf("%s", line );
-		free(line);
-		line = get_next_line(fd);
-	}
-	return (0);
-}*/
+    line = get_next_line(fd);
+    while (line)
+    {
+        printf("%s", line);
+        free(line);
+        line = get_next_line(fd);
+    }
+
+    close(fd); // Feche o arquivo após a leitura
+    return (0);
+}
 	
