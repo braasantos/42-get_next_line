@@ -6,199 +6,123 @@
 /*   By: bjorge-m <bjorge-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/20 13:46:27 by bjorge-m          #+#    #+#             */
-/*   Updated: 2023/10/21 14:10:39 by bjorge-m         ###   ########.fr       */
+/*   Updated: 2023/10/23 14:46:40 by bjorge-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <fcntl.h>
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
-	if(!s)
-		return (0);
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
 /*
-* serve com flag para saber se tem uma new line na string 
-*/
-int ft_findnl(char *s)
-{
-	int i;
-
-	i = 0;
-	if(!s)
-		return (0);
-	while(s[i] && s[i] != '\n')
-	{
-		i++;	
-	}
-		if(s[i] == '\n')
-			return (1);
-	return (0);
-}
-/*
-* concatena a string ate a newline
-*/
-char	*ft_strjoin( char *s1,  char *s2)
-{
-	size_t	i;
-	size_t	j;
-	size_t	s1_len;
-	size_t	s2_len;
-	char *mlc;
-
-	s2_len = ft_strlen(s2);
-	s1_len = ft_strlen(s1);
-	mlc = (char *)malloc((s1_len + s2_len + 1) * sizeof(char));
-	if (!mlc)
-		return (NULL);
-	i = 0;
-	while (s1 && s1[i])
-	{
-		mlc[i] = s1[i];
-		i++;
-	}
-	j = 0;
-	while (s2 && s2[j])
-		mlc[i++] = s2[j++];
-	mlc[i] = '\0';
-	return (mlc);
-}
-/*
-* cria uma nova string com o conteudo do buffer ate a newline
-*/
-char	*ft_strdup( char *s)
-{
-	int		len;
-	int		i;
-	char	*mlc;
-	if (!s || *s == '\0')
-		return (NULL);
-	len = ft_strlen(s);
-	mlc = (char *)malloc ((len + 1) * sizeof(char));
-	if (!mlc)
-		return (NULL);
-	i = 0;
-	while (s[i] && s[i] != '\n')
-	{
-		mlc[i] = s[i];
-		i++;
-	}
-	if (s[i] == '\n')
-	{
-		mlc[i] = s[i];
-		i++;
-	}
-	mlc[i] = '\0';
-	free(s);
-	return (mlc);
-}
-
-/*
-* limpa o buffer para quando for chamado novamente ele junta tudo depois da nova linha 
+* limpa o buffer para quando for 
+* chamado novamente ele junta tudo depois da nova linha 
 */
 char	*ft_nextline(char *s)
 {
 	char	*mlc;
-	int i;
-	int j;
+	int		i;
+	int		j;
+
 	i = 0;
 	while (s[i] && s[i] != '\n')
 		i++;
-	if (!s)
+	if (s[i] == '\0')
 	{
 		free(s);
 		return (NULL);
 	}
-	mlc = (char *)malloc((ft_strlen(s)- i + 1) *sizeof(char));
-	if(!mlc)
+	mlc = ft_calloc((ft_strlen(s) + 1 - i), sizeof(char));
+	if (!mlc)
 		return (NULL);
 	i++;
 	j = 0;
 	while (s[i])
-	{
 		mlc[j++] = s[i++];
-	}
 	mlc[j] = '\0';
-	free(s);
+	if (s)
+		free(s);
 	return (mlc);
+}
+
+char	*ft_clean(char *buff, char *buffer)
+{
+	if (buff)
+		free(buff);
+	if (buffer)
+		free(buffer);
+	return (NULL);
 }
 /*
 * adiciona o conteudo do ficheiro ao buff e verifica se tem uma new line 
 */
+
 char	*add_to_buff(int fd, char *buffer)
 {
-	char *buff;
-	int bytes;
+	char	*buff;
+	int		bytes;
 
-	buff = malloc(BUFFER_SIZE + 1 * sizeof(char));
+	buff = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!buff)
 		return (NULL);
 	bytes = 1;
- 	while (bytes != 0 && !ft_findnl(buffer))
-	{	
+	while (bytes != 0 && !ft_findnl(buffer))
+	{
 		bytes = read(fd, buff, BUFFER_SIZE);
-		if (bytes < 0)
+		if (bytes == 0)
 		{
 			free(buff);
+			buff = NULL;
 			if (buffer)
-				free(buffer);
+				return (buffer);
 			return (NULL);
 		}
+		if (bytes == -1)
+			return (ft_clean(buff, buffer));
 		buff[bytes] = '\0';
 		buffer = ft_strjoin(buffer, buff);
-		if (ft_findnl(buffer))
-			break ;
 	}
-	free(buff);
+	ft_clean(buff, NULL);
 	return (buffer);
 }
 /*
 * funcao principal
 */
+
 char	*get_next_line(int fd)
 {
-	char	*line;
-	static char *buffer;
+	char		*line;
+	static char	*buffer = NULL;
 
+	line = NULL;
 	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	buffer = add_to_buff(fd, buffer);
+	if (!buffer || buffer[0] == '\0')
 	{
 		free(buffer);
+		buffer = NULL;
 		return (NULL);
 	}
-	buffer = add_to_buff(fd, buffer);
-	if(!buffer)
-		return (NULL);
 	line = ft_strdup(buffer);
 	buffer = ft_nextline(buffer);
 	return (line);
 }
 
-int main(void)
-{
-    int fd;
-    char *line;
-    fd = open("test.txt", O_RDONLY);
-    
-    if (fd == -1) {
-        perror("Error opening file");
-        return 1;
-    }
-
-    line = get_next_line(fd);
-    while (line)
-    {
-        printf("%s", line);
-        free(line);
-        line = get_next_line(fd);
-    }
-
-    close(fd); // Feche o arquivo após a leitura
-    return (0);
-}
-	
+// int main(void)
+// {
+//     int fd;
+//     char *line;
+//     fd = open("test.txt", O_RDONLY);
+//     if (fd == -1) {
+//         perror("Error opening file");
+//         return 1;
+//     }
+//     line = get_next_line(fd);
+//     while (line)
+//     {
+//         printf("%s", line);
+//         free(line);
+//         line = get_next_line(fd);
+//     }
+//     close(fd); // Feche o arquivo após a leitura
+//     return (0);
+// }
