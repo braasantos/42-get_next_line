@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bjorge-m <bjorge-m@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 12:30:04 by bjorge-m          #+#    #+#             */
-/*   Updated: 2024/07/02 14:26:34 by bjorge-m         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:39:15 by bjorge-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 /// @brief			Counts the size of a strig
 /// @param s		The string to be counted
@@ -45,6 +45,7 @@ int	ft_findnl(char *s)
 		return (1);
 	return (0);
 }
+
 /// @brief			Allocate memory dinamically
 /// @param nmemb	The number os bytes to allocate
 /// @param size		The size of the variable
@@ -70,6 +71,7 @@ void	*ft_calloc(size_t nmemb, size_t size)
 	}
 	return (b);
 }
+
 /// @brief			Join two strings
 /// @param s1		The first string to join
 /// @param s2		The second string to join to the first
